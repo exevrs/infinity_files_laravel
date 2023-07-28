@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 
-
 $list_files = function () {
     $result = array();
 
@@ -27,7 +26,6 @@ $list_files = function () {
             "size" => $size,
             "modified" => $lastModified
         ]);
-
     }
 
     return response([
@@ -35,30 +33,43 @@ $list_files = function () {
     ], 200);
 };
 
-$get_file = function () {
-    return response(Storage::disk('local')->get('Test1.txt'), 200);
+$get_file = function (Request $request) {
+
+    $partition = $request->query("partition");
+    $filename = $request->query("file_name");
+
+    $file_to_name = "".$partition."/".$filename;
+
+    $file = Storage::disk('local')->get($file_to_name);
+
+    if ($file) {
+        return response($file, 200);
+    } else {
+        return response("Not found", 404);
+    }
 };
 
 
 $upload_file = function (Request $request) {
 
-    $file = $request->file('file');
-    $fileName = $file->getClientOriginalName();
-
-    $path = Storage::disk('local')->putFileAs('uploads', $file, $fileName);
+    $code = $request->query("code");
 
 
-    return response('ok', 200);
+    if (getenv("INFINITY_FILES_API_KEY") == $code) {
+
+        $partition = $request->query("partition");
+        $filename = $request->query("file_name");
+        $file = $request->file('file');
+
+        Storage::disk('local')->putFileAs($partition, $file, $filename);
+
+        return response('ok', 200);
+    } else {
+        return response('Access denied', 403);
+    }
 
 };
 
-
-
-function writeFileToStorage(string $fileName, string $fileContent)
-{
-    $path = Storage::disk('local')->put($fileName, $fileContent);
-    return $path;
-}
 
 
 Route::get('/files/list-files', $list_files);
