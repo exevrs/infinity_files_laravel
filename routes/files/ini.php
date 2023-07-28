@@ -19,7 +19,12 @@ $list_files = function () {
         $lastModified = $disc->lastModified($file);
 
         $filePath = (string) $file;
-        $filePath = str_replace("\\", "x", $filePath);
+
+        for ($i = 0; $i < strlen($filePath); $i++) {
+            Log::info($filePath[$i]);
+        }
+
+        $filePath = str_replace("//", "x", $filePath);
 
         array_push($result, [
             "file_path" => $filePath,
@@ -38,7 +43,7 @@ $get_file = function (Request $request) {
     $partition = $request->query("partition");
     $filename = $request->query("file_name");
 
-    $file_to_name = "".$partition."/".$filename;
+    $file_to_name = "" . $partition . "/" . $filename;
 
     $file = Storage::disk('local')->get($file_to_name);
 
