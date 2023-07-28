@@ -1,0 +1,19 @@
+RewriteEngine On
+RewriteBase /
+
+# Allow POST method
+RewriteCond %{REQUEST_METHOD} !^POST$
+RewriteCond %{THE_REQUEST} \s/+/ping(\.php)?\s
+RewriteRule ^ / [R=301,L]
+
+# Rewrite all requests to default.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ default.php [L]
+
+
+Header always set Access-Control-Allow-Origin "*"
+Header always set Access-Control-Allow-Methods "POST, GET"
+Header always set Access-Control-Allow-Headers "Content-Type, X-Requested-With, Origin, Accept, Authorization"
+
+
