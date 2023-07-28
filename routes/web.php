@@ -13,6 +13,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+$lambdaX = function () {
+    return response('ok', 200);
+
+};
+
+Route::get("/ping", $lambdaX);
+
 Route::get('/', function () {
     return view('welcome');
 });
