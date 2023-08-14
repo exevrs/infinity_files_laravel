@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 require base_path('routes/files/ini.php');
+require base_path('routes/infinity/ini.php');
 
 /*
 |--------------------------------------------------------------------------
