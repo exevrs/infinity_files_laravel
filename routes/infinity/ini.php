@@ -49,7 +49,9 @@ $bake_projects_cache = function (Request $request) {
 
         Log::info("Making cache for " . $partition);
 
-        $disc->put($partition . "/cache/projects.json", json_encode($results));
+        $disc->put($partition . "/cache/projects.json", json_encode([
+            "projects" => $results
+        ]));
 
         return response('ok', 200);
     } else {
