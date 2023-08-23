@@ -34,7 +34,6 @@ $bake_projects_cache = function (Request $request) {
                     array_push($results, [
                         "id" => $jsonData["id"],
                         "uid" => $jsonData["uid"],
-                        "title" => $jsonData["title"],
                         "name" => $jsonData["name"],
                         "version" => $jsonData["version"],
                         "updated_at" => $jsonData["updated_at"],
