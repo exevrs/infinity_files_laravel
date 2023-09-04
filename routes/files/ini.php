@@ -48,10 +48,24 @@ $get_file = function (Request $request) {
     $file = Storage::disk('local')->get($file_to_name);
 
     if ($file) {
-        return response($file, 200);
+           return response($file, 200);
     } else {
         return response("Not found", 404);
     }
+};
+
+$get_file_response = function (Request $request) {
+    $partition = $request->query("partition");
+    $filename = $request->query("file_name");
+
+    $file_to_name = "" . $partition . "/" . $filename;
+
+    if (Storage::disk('local')->exists($file_to_name);) {
+        return response()->download($file_to_name);
+    } else {
+        return response("Not found", 404);
+    }
+
 };
 
 
@@ -79,6 +93,7 @@ $upload_file = function (Request $request) {
 
 Route::get('/files/list-files', $list_files);
 Route::get('/files/get-file', $get_file);
+Route::get('/files/get-file-response', $get_file_response);
 
 
 //Posts
