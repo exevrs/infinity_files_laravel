@@ -60,7 +60,7 @@ $get_file_response = function (Request $request) {
 
     $file_to_name = "" . $partition . "/" . $filename;
 
-    if (Storage::disk('local')->exists($file_to_name);) {
+    if (Storage::disk('local')->exists($file_to_name)) {
         return response()->download($file_to_name);
     } else {
         return response("Not found", 404);
