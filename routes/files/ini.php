@@ -76,7 +76,7 @@ $get_file_response = function (Request $request) {
 
 $delete_folder = function (Request $request) {
     $partition = $request->query("partition");
-    $path = $request->query("pathname");
+    $path = $request->query("path_name");
 
     $file_to_name = "" . $partition . "/" . $path;
 
