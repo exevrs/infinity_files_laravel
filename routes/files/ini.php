@@ -48,7 +48,7 @@ $get_file = function (Request $request) {
     $file = Storage::disk('local')->get($file_to_name);
 
     if ($file) {
-           return response($file, 200);
+        return response($file, 200);
     } else {
         return response("Not found", 404);
     }
@@ -60,12 +60,32 @@ $get_file_response = function (Request $request) {
 
     $file_to_name = "" . $partition . "/" . $filename;
 
+    $path = storage_path('app/' . $file_to_name);
+
     if (Storage::disk('local')->exists($file_to_name)) {
-        return response()->download($file_to_name);
+        return response()->streamDownload(function () use ($path) {
+            $fd = fopen($path, 'rb');
+            while (!feof($fd)) {
+                echo fread($fd, 2048);
+            }
+        }, $filename);
     } else {
         return response("Not found", 404);
     }
+};
 
+$delete_folder = function (Request $request) {
+    $partition = $request->query("partition");
+    $path = $request->query("pathname");
+
+    $file_to_name = "" . $partition . "/" . $path;
+
+    if (Storage::disk('local')->exists($file_to_name)) {
+        Storage::disk('local')->deleteDirectory($file_to_name);
+        return response("Directory " . $file_to_name . " deleted", 200);
+    } else {
+        return response("Not found", 404);
+    }
 };
 
 
@@ -86,11 +106,10 @@ $upload_file = function (Request $request) {
     } else {
         return response('Access denied', 403);
     }
-
 };
 
 
-
+//Get
 Route::get('/files/list-files', $list_files);
 Route::get('/files/get-file', $get_file);
 Route::get('/files/get-file-response', $get_file_response);
@@ -98,3 +117,6 @@ Route::get('/files/get-file-response', $get_file_response);
 
 //Posts
 Route::post('/files/upload-file', $upload_file);
+
+//Delete
+Route::delete('/files/delete-folder', $delete_folder);
