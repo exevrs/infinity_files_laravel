@@ -132,7 +132,6 @@ class FileManagerController extends Controller
         $validator = Validator::make($request->all(), [
             'partition' => 'required',
             'file_name' => 'required',
-            'file' => 'required',
             'code' => 'required',
         ]);
 
@@ -146,7 +145,9 @@ class FileManagerController extends Controller
             return response("Access denied", 403);
         }
 
-        Storage::disk('local')->putFileAs($data['partition'], $data['file_name'], $data['file']);
+        $file = $request->file('file');
+
+        Storage::disk('local')->putFileAs($data['partition'], $data['file_name'], $file);
 
         return response('' . $data['file_name'] . 'File', 200);
     }
