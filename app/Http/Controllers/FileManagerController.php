@@ -147,7 +147,7 @@ class FileManagerController extends Controller
 
         $file = $request->file('file');
 
-        Storage::disk('local')->putFileAs($data['partition'], $data['file_name'], $file);
+        Storage::disk('local')->putFileAs($data['partition'], $file, $data['file_name']);
 
         return response('' . $data['file_name'] . 'File', 200);
     }
