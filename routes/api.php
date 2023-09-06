@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\FileManagerController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\StatisticController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -40,4 +41,5 @@ Route::prefix('files')->group(function () {
 
 //Statistics
 Route::prefix('statistics')->group(function () {
+    Route::get('get-statistic', [StatisticController::class, 'getStat']);
 });

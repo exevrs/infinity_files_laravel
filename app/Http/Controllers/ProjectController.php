@@ -21,7 +21,10 @@ class ProjectController extends Controller
 
         $data = $validator->validated();
 
-        if(!FileManagerController::checkCode($data['partition'], $data['code'])){
+        $partition = $data['partition'];        
+        $code = $data['code'];
+
+        if(!FileManagerController::checkCode($partition, $code)){
             return response("Access denied", 403);
         };
 
@@ -29,7 +32,7 @@ class ProjectController extends Controller
 
         $results = [];
 
-        foreach ($disc->directories($data['partition']) as $directory) {
+        foreach ($disc->directories($partition) as $directory) {
 
             $projectsJsonPath = ((string) $directory) . "/project.json";
 
@@ -56,9 +59,9 @@ class ProjectController extends Controller
             }
         }
 
-        Log::info("Making cache for " . $data['partition']);
+        Log::info("Making cache for " . $partition);
 
-        $disc->put($data['partition'] . "/cache/projects.json", json_encode([
+        $disc->put($partition . "/cache/projects.json", json_encode([
             "projects" => $results
         ]));
 

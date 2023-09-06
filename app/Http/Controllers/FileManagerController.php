@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Partition;
+use App\Models\Statistic;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -54,11 +56,25 @@ class FileManagerController extends Controller
 
         $data = $validator->validated();
 
-        $path_name = "" . $data['partition'] . "/" . $data['file_name'];
+        $partition = $data['partition'];
+        $file_name = $data['file_name'];
+
+        $path_name = "" . $partition . "/" . $file_name;
 
         $file = Storage::disk('local')->get($path_name);
 
         if ($file) {
+            try {
+                if (str_contains($file_name, "project.json")) {
+                    $pattern = '/project-([^\/]+)/';
+
+                    if (preg_match($pattern, $file_name, $matches)) {
+                        $uid = $matches[1];
+                        StatisticController::addStat($uid);
+                    }
+                }
+            } catch (\Exception $ex) {
+            }
             return response($file, 200);
         } else {
             return response("Not found", 404);
@@ -72,7 +88,10 @@ class FileManagerController extends Controller
             'file_name' => 'required',
         ]);
 
-        $path_name = "" . $data['partition'] . "/" . $data['file_name'];
+        $partition = $data['partition'];
+        $file_name = $data['file_name'];
+
+        $path_name = "" . $partition . "/" . $file_name;
 
         $path = storage_path('app/' . $path_name);
 
@@ -82,7 +101,7 @@ class FileManagerController extends Controller
                 while (!feof($fd)) {
                     echo fread($fd, 2048);
                 }
-            }, $data['file_name']);
+            }, $file_name);
         } else {
             return response("Not found", 404);
         }
@@ -113,11 +132,15 @@ class FileManagerController extends Controller
 
         $data = $validator->validated();
 
-        if (!$this->checkCode($data['partition'], $data['code'])) {
+        $partition = $data['partition'];
+        $path_name = $data['path_name'];
+        $code = $data['code'];
+
+        if (!$this->checkCode($partition, $code)) {
             return response("Access denied", 403);
         };
 
-        $path = "" . $data['partition'] . "/" . $data['path_name'];
+        $path = "" . $partition . "/" . $path_name;
 
         if (Storage::disk('local')->exists($path)) {
             Storage::disk('local')->deleteDirectory($path);
@@ -141,13 +164,17 @@ class FileManagerController extends Controller
 
         $data = $validator->validated();
 
-        if (!$this->checkCode($data['partition'], $data['code'])) {
+        $partition = $data['partition'];
+        $file_name = $data['file_name'];
+        $code = $data['code'];
+
+        if (!$this->checkCode($partition, $code)) {
             return response("Access denied", 403);
         }
 
         $file = $request->file('file');
 
-        Storage::disk('local')->putFileAs($data['partition'], $file, $data['file_name']);
+        Storage::disk('local')->putFileAs($partition, $file, $file_name);
 
         return response('File uploaded', 200);
     }
