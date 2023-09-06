@@ -88,7 +88,7 @@ class FileManagerController extends Controller
         }
     }
 
-    private function checkCode(string $partition_name, string $code)
+    public static function checkCode(string $partition_name, string $code)
     {
         $partition = Partition::where('name', $partition_name)->first();
 
@@ -149,6 +149,6 @@ class FileManagerController extends Controller
 
         Storage::disk('local')->putFileAs($data['partition'], $file, $data['file_name']);
 
-        return response('' . $data['file_name'] . 'File', 200);
+        return response('File uploaded', 200);
     }
 }

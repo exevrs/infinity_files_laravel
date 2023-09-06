@@ -3,24 +3,33 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
+class ProjectController extends Controller
+{
+    public function bakeCache(Request $request){
+        $validator = Validator::make($request->all(), [
+            'partition' => 'required',
+            'code' => 'required',
+        ]);
 
-$bake_projects_cache = function (Request $request) {
+        if ($validator->fails()) {
+            return response("Access denied", 403);
+        }
 
-    $code = $request->query("code");
+        $data = $validator->validated();
 
-    if (getenv("INFINITY_FILES_API_KEY") == $code) {
-
-        $partition = $request->query("partition");
+        if(!FileManagerController::checkCode($data['partition'], $data['code'])){
+            return response("Access denied", 403);
+        };
 
         $disc = Storage::disk('local');
 
         $results = [];
 
-        foreach ($disc->directories($partition) as $directory) {
+        foreach ($disc->directories($data['partition']) as $directory) {
 
             $projectsJsonPath = ((string) $directory) . "/project.json";
 
@@ -47,17 +56,12 @@ $bake_projects_cache = function (Request $request) {
             }
         }
 
-        Log::info("Making cache for " . $partition);
+        Log::info("Making cache for " . $data['partition']);
 
-        $disc->put($partition . "/cache/projects.json", json_encode([
+        $disc->put($data['partition'] . "/cache/projects.json", json_encode([
             "projects" => $results
         ]));
 
-        return response('ok', 200);
-    } else {
-        return response('Access denied', 403);
+        return response('Cache baked', 200);
     }
-};
-
-//Posts
-Route::put('/infinity/projects/make-cache', $bake_projects_cache);
+}

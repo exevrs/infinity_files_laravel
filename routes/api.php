@@ -1,10 +1,9 @@
 <?php
 
 use App\Http\Controllers\FileManagerController;
+use App\Http\Controllers\ProjectController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
-require base_path('routes/infinity/ini.php');
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +18,12 @@ require base_path('routes/infinity/ini.php');
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+//Projects
+Route::prefix('infinity/projects')->group(function () {
+    //Put
+    Route::put('make-cache', [ProjectController::class, 'bakeCache']);
 });
 
 //Files
